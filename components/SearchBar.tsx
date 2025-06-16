@@ -18,4 +18,4 @@ const SearchBar = ({ placeholder, onPress }: { placeholder: string; onPress?: ()
   )
 }
 
-export default SearchBar
+export default SearchBar    
