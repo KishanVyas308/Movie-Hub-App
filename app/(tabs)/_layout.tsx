@@ -53,8 +53,7 @@ const TabIcon = ({ focused, title, icon }: { focused: boolean, title: string, ic
 }
 
 const _layout = () => {
-    return (
-        <Tabs
+    return (        <Tabs
             screenOptions={{
                 tabBarShowLabel: false,
                 tabBarItemStyle: {
@@ -73,8 +72,13 @@ const _layout = () => {
                     overflow: 'hidden',
                     borderColor: '#0F0D23'
                 },
-                animation: 'shift'    
-
+                animation: 'none',
+               sceneStyle: {
+                   backgroundColor: '#030014'
+               },
+               headerStyle: {
+                   backgroundColor: '#030014'
+               }
             }}
         >
             <Tabs.Screen
