@@ -16,4 +16,8 @@ export const icons = {
   star,
   play,
   arrow,
+  // Using existing icons as fallbacks for missing ones
+  calendar: star, // Using star as calendar placeholder
+  trending: star, // Using star as trending placeholder
+  film: play, // Using play as film placeholder
 };
