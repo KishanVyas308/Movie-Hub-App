@@ -1,5 +1,4 @@
 import EnhancedMovieCard from '@/components/EnhancedMovieCard'
-import { icons } from '@/constants/icons'
 import {
   fetchMovies,
   fetchNowPlayingMovies,
@@ -12,11 +11,11 @@ import React, { useCallback, useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Text,
   TouchableOpacity,
   View
 } from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons'
 
 const CategoryMovies = () => {
   const { type } = useLocalSearchParams()
@@ -141,7 +140,7 @@ const CategoryMovies = () => {
       {/* Header */}
       <View className='flex-row items-center px-5 pt-12 pb-4'>
         <TouchableOpacity onPress={() => router.back()} className='mr-4'>
-          <Image source={icons.arrow} className='w-6 h-6' tintColor='white' />
+           <Icon name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text className='text-white text-xl font-bold flex-1'>
           {getCategoryTitle()}
