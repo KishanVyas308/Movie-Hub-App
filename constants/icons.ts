@@ -20,4 +20,5 @@ export const icons = {
   calendar: star, // Using star as calendar placeholder
   trending: star, // Using star as trending placeholder
   film: play, // Using play as film placeholder
+  filter: star, // Using star as filter placeholder
 };
