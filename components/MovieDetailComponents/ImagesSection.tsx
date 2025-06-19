@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  FlatList, 
-  Image, 
-  ActivityIndicator 
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface ImagesSectionProps {
@@ -91,10 +91,10 @@ const ImagesSection = ({ images, loading, onImagePress }: ImagesSectionProps) =>
   const totalImages = backdrops.length + posters.length;
   const topBackdrops = backdrops
     .sort((a, b) => b.vote_average - a.vote_average)
-    .slice(0, 6);
+    .slice(0, backdrops.length);
   const topPosters = posters
     .sort((a, b) => b.vote_average - a.vote_average)
-    .slice(0, 6);
+    .slice(0, posters.length);
 
   return (
     <View className='mb-8'>

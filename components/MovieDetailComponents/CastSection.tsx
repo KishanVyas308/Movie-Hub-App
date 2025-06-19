@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  FlatList, 
-  Image, 
-  ActivityIndicator 
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface CastSectionProps {

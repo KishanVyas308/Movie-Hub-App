@@ -330,7 +330,7 @@ const MovieDetails = () => {
             onGenrePress={handleGenrePress}
           />
 
-          {/* Action Buttons */}
+          {/* Action Buttons and Where To Watch */}
           <MovieActions
             inWatchlist={inWatchlist}
             inFavorites={inFavorites}
