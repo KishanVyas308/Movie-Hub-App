@@ -48,7 +48,7 @@ interface OptionsModalProps {
   visible: boolean;
   onClose: () => void;
   movieData?: Movie | null;
-  onStatusChange?: () => void;
+  onStatusChange?: (movieId?: number) => void;
 }
 
 const OptionsModal: React.FC<OptionsModalProps> = ({
@@ -151,8 +151,8 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
         setInFavorites(true);
       }
       
-      // Trigger refresh of movie cards
-      onStatusChange?.();
+      // Trigger refresh of movie cards with specific movie ID
+      onStatusChange?.(movieData.id);
     } catch (error) {
       console.error('Error updating favorites:', error);
     }
@@ -180,8 +180,8 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
         setInWatchlist(true);
       }
       
-      // Trigger refresh of movie cards
-      onStatusChange?.();
+      // Trigger refresh of movie cards with specific movie ID
+      onStatusChange?.(movieData.id);
     } catch (error) {
       console.error('Error updating watchlist:', error);
     }
@@ -209,8 +209,8 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
         setIsWatchedMovie(true);
       }
       
-      // Trigger refresh of movie cards
-      onStatusChange?.();
+      // Trigger refresh of movie cards with specific movie ID
+      onStatusChange?.(movieData.id);
     } catch (error) {
       console.error('Error updating watched status:', error);
     }
