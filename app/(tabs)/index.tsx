@@ -30,9 +30,10 @@ interface MovieSectionProps {
   loading: boolean;
   onSeeAll?: () => void;
   onOptionsPress?: (movie: Movie) => void;
+  refreshTrigger?: number;
 }
 
-const MovieSection = ({ title, movies, loading, onSeeAll, onOptionsPress }: MovieSectionProps) => {
+const MovieSection = ({ title, movies, loading, onSeeAll, onOptionsPress, refreshTrigger }: MovieSectionProps) => {
   if (loading) {
     return (
       <View className="mt-6">
@@ -59,7 +60,7 @@ const MovieSection = ({ title, movies, loading, onSeeAll, onOptionsPress }: Movi
         data={movies.slice(0, 6)}
         renderItem={({ item }) => (
           <View className="mr-4 w-32">
-            <EnhancedMovieCard {...item} showActions={false} onOptionsPress={onOptionsPress} />
+            <EnhancedMovieCard {...item} showActions={false} onOptionsPress={onOptionsPress} refreshTrigger={refreshTrigger} />
           </View>
         )}
         keyExtractor={(item) => item.id.toString()}
@@ -77,6 +78,7 @@ export default function Index() {
   const router = useRouter();
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const { data: popularMovies, loading: popularLoading, error: popularError } = 
     useFetch(() => fetchMovies({ query: '' }));
@@ -123,6 +125,11 @@ export default function Index() {
     setSelectedMovie(null);
   };
 
+  const handleStatusChange = () => {
+    // Increment refresh trigger to force re-render of movie cards
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   return (
     <View className="flex-1 bg-primary">
       <Image source={images.bg} className="absolute w-full z-0" />
@@ -155,18 +162,7 @@ export default function Index() {
               <View className='flex-row items-center justify-center flex-1'>
                 <Image source={icons.logo} className='w-12 h-10' />
               </View>
-              <View className='flex-1 items-end'>
-                <TouchableOpacity 
-                  onPress={() => handleOptionsPress()}
-                  className='p-2 rounded-full bg-black/20'
-                >
-                  <View className='flex-row'>
-                    <View className='w-1 h-1 bg-white rounded-full mx-0.5' />
-                    <View className='w-1 h-1 bg-white rounded-full mx-0.5' />
-                    <View className='w-1 h-1 bg-white rounded-full mx-0.5' />
-                  </View>
-                </TouchableOpacity>
-              </View>
+             
             </View>
             <SearchBar
               onPress={() => router.push('/search')}
@@ -206,16 +202,7 @@ export default function Index() {
                           </Text>
                         </View>
                       </View>
-                      <TouchableOpacity 
-                        onPress={() => handleOptionsPress(popularMovies[0])}
-                        className='p-2 rounded-full bg-black/40 ml-2'
-                      >
-                        <View className='flex-row'>
-                          <View className='w-1 h-1 bg-white rounded-full mx-0.5' />
-                          <View className='w-1 h-1 bg-white rounded-full mx-0.5' />
-                          <View className='w-1 h-1 bg-white rounded-full mx-0.5' />
-                        </View>
-                      </TouchableOpacity>
+                     
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -229,6 +216,7 @@ export default function Index() {
               loading={trendingLoading}
               onSeeAll={handleSeeAllTrending}
               onOptionsPress={handleOptionsPress}
+              refreshTrigger={refreshTrigger}
             />
 
             <MovieSection
@@ -237,6 +225,7 @@ export default function Index() {
               loading={nowPlayingLoading}
               onSeeAll={handleSeeAllNowPlaying}
               onOptionsPress={handleOptionsPress}
+              refreshTrigger={refreshTrigger}
             />
 
             <MovieSection
@@ -245,6 +234,7 @@ export default function Index() {
               loading={topRatedLoading}
               onSeeAll={handleSeeAllTopRated}
               onOptionsPress={handleOptionsPress}
+              refreshTrigger={refreshTrigger}
             />
 
             <MovieSection
@@ -253,6 +243,7 @@ export default function Index() {
               loading={upcomingLoading}
               onSeeAll={handleSeeAllUpcoming}
               onOptionsPress={handleOptionsPress}
+              refreshTrigger={refreshTrigger}
             />
 
             <MovieSection
@@ -261,6 +252,7 @@ export default function Index() {
               loading={popularLoading}
               onSeeAll={handleSeeAllPopular}
               onOptionsPress={handleOptionsPress}
+              refreshTrigger={refreshTrigger}
             />
           </View>
         )}
@@ -271,6 +263,7 @@ export default function Index() {
         visible={showOptionsModal}
         onClose={handleCloseOptions}
         movieData={selectedMovie}
+        onStatusChange={handleStatusChange}
       />
     </View>
   );

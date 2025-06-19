@@ -1,5 +1,5 @@
 import { icons } from '@/constants/icons';
-import { addToFavorites, addToWatchlist, isFavorite, isInWatchlist, removeFromFavorites, removeFromWatchlist } from '@/services/storage';
+import { addToFavorites, addToWatchlist, isFavorite, isInWatchlist, isWatched, removeFromFavorites, removeFromWatchlist } from '@/services/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -9,6 +9,7 @@ interface EnhancedMovieCardProps extends Movie {
   showActions?: boolean;
   isFromSearchPage?: boolean;
   onOptionsPress?: (movie: Movie) => void;
+  refreshTrigger?: number;
 }
 
 const EnhancedMovieCard = ({ 
@@ -20,24 +21,28 @@ const EnhancedMovieCard = ({
   showActions = true,
   isFromSearchPage = false,
   onOptionsPress,
+  refreshTrigger,
   ...movieData
 }: EnhancedMovieCardProps) => {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [inFavorites, setInFavorites] = useState(false);
+  const [isWatchedMovie, setIsWatchedMovie] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     checkStatus();
-  }, [id]);
+  }, [id, refreshTrigger]);
 
   const checkStatus = async () => {
     try {
-      const [watchlistStatus, favoriteStatus] = await Promise.all([
+      const [watchlistStatus, favoriteStatus, watchedStatus] = await Promise.all([
         isInWatchlist(id),
-        isFavorite(id)
+        isFavorite(id),
+        isWatched(id)
       ]);
       setInWatchlist(watchlistStatus);
       setInFavorites(favoriteStatus);
+      setIsWatchedMovie(watchedStatus);
     } catch (error) {
       console.error('Error checking movie status:', error);
     }
@@ -138,15 +143,31 @@ const EnhancedMovieCard = ({
         {onOptionsPress && (
           <TouchableOpacity 
             onPress={handleOptionsPress}
-            className='absolute top-2 right-2 p-2 rounded-full bg-black/60'
+            className='absolute top-2 right-2 py-2 px-0.5 rounded-xl bg-black/60'
           >
-            <View className='flex-col '>
-              <View className='w-1 h-1 bg-white rounded-full my-0.5' />
-              <View className='w-1 h-1 bg-white rounded-full my-0.5' />
-              <View className='w-1 h-1 bg-white rounded-full my-0.5' />
-            </View>
+            
+            <Ionicons name="ellipsis-vertical" size={20} color="white" />
           </TouchableOpacity>
         )}
+
+        {/* Status Badges */}
+        <View className='absolute bottom-2 right-2 flex-row'>
+          {inFavorites && (
+            <View className='bg-red-500 rounded-full p-1 mr-1'>
+              <Ionicons name="heart" size={10} color="white" />
+            </View>
+          )}
+          {inWatchlist && (
+            <View className='bg-accent rounded-full p-1 mr-1'>
+              <Ionicons name="bookmark" size={10} color="white" />
+            </View>
+          )}
+          {isWatchedMovie && (
+            <View className='bg-green-500 rounded-full p-1'>
+              <Ionicons name="checkmark" size={10} color="white" />
+            </View>
+          )}
+        </View>
       </View>
 
       <Text className='text-white text-sm font-bold mt-2' numberOfLines={1}>

@@ -1,5 +1,4 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -11,6 +10,17 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { 
+  addToFavorites, 
+  addToWatchlist, 
+  isFavorite, 
+  isInWatchlist, 
+  isWatched, 
+  markAsWatched, 
+  removeFromFavorites, 
+  removeFromWatchlist, 
+  removeFromWatched 
+} from '@/services/storage';
 
 // Import Movie interface from global types
 declare global {
@@ -38,23 +48,25 @@ interface OptionsModalProps {
   visible: boolean;
   onClose: () => void;
   movieData?: Movie | null;
+  onStatusChange?: () => void;
 }
 
 const OptionsModal: React.FC<OptionsModalProps> = ({
   visible,
   onClose,
-  movieData
+  movieData,
+  onStatusChange
 }) => {
-  const [favorites, setFavorites] = useState<number[]>([]);
-  const [savedMovies, setSavedMovies] = useState<number[]>([]);
-  const [watchedMovies, setWatchedMovies] = useState<number[]>([]);
+  const [inFavorites, setInFavorites] = useState(false);
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [isWatchedMovie, setIsWatchedMovie] = useState(false);
   
   const slideAnim = useRef(new Animated.Value(460)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     loadUserData();
-  }, []);
+  }, [movieData]);
 
   useEffect(() => {
     if (visible) {
@@ -83,24 +95,20 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
   }, [visible]);
 
   const loadUserData = async () => {
+    if (!movieData) return;
+    
     try {
-      const favoritesData = await AsyncStorage.getItem('favorites');
-      const savedData = await AsyncStorage.getItem('savedMovies');
-      const watchedData = await AsyncStorage.getItem('watchedMovies');
+      const [favoriteStatus, watchlistStatus, watchedStatus] = await Promise.all([
+        isFavorite(movieData.id),
+        isInWatchlist(movieData.id),
+        isWatched(movieData.id)
+      ]);
       
-      if (favoritesData) setFavorites(JSON.parse(favoritesData));
-      if (savedData) setSavedMovies(JSON.parse(savedData));
-      if (watchedData) setWatchedMovies(JSON.parse(watchedData));
+      setInFavorites(favoriteStatus);
+      setInWatchlist(watchlistStatus);
+      setIsWatchedMovie(watchedStatus);
     } catch (error) {
       console.error('Error loading user data:', error);
-    }
-  };
-
-  const saveUserData = async (key: string, data: number[]) => {
-    try {
-      await AsyncStorage.setItem(key, JSON.stringify(data));
-    } catch (error) {
-      console.error(`Error saving ${key}:`, error);
     }
   };
 
@@ -124,52 +132,88 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
   const handleAddToFavorites = async () => {
     if (!movieData) return;
 
-    const movieId = movieData.id;
-    const isFavorite = favorites.includes(movieId);
-    
-    let updatedFavorites;
-    if (isFavorite) {
-      updatedFavorites = favorites.filter(id => id !== movieId);
-    } else {
-      updatedFavorites = [...favorites, movieId];
+    try {
+      const movieItem = {
+        id: Date.now(),
+        movieId: movieData.id,
+        title: movieData.title,
+        poster_path: movieData.poster_path || '',
+        vote_average: movieData.vote_average,
+        release_date: movieData.release_date,
+        addedAt: new Date().toISOString()
+      };
+
+      if (inFavorites) {
+        await removeFromFavorites(movieData.id);
+        setInFavorites(false);
+      } else {
+        await addToFavorites(movieItem);
+        setInFavorites(true);
+      }
+      
+      // Trigger refresh of movie cards
+      onStatusChange?.();
+    } catch (error) {
+      console.error('Error updating favorites:', error);
     }
-    
-    setFavorites(updatedFavorites);
-    await saveUserData('favorites', updatedFavorites);
   };
 
   const handleSaveMovie = async () => {
     if (!movieData) return;
 
-    const movieId = movieData.id;
-    const isSaved = savedMovies.includes(movieId);
-    
-    let updatedSaved;
-    if (isSaved) {
-      updatedSaved = savedMovies.filter(id => id !== movieId);
-    } else {
-      updatedSaved = [...savedMovies, movieId];
+    try {
+      const movieItem = {
+        id: Date.now(),
+        movieId: movieData.id,
+        title: movieData.title,
+        poster_path: movieData.poster_path || '',
+        vote_average: movieData.vote_average,
+        release_date: movieData.release_date,
+        addedAt: new Date().toISOString()
+      };
+
+      if (inWatchlist) {
+        await removeFromWatchlist(movieData.id);
+        setInWatchlist(false);
+      } else {
+        await addToWatchlist(movieItem);
+        setInWatchlist(true);
+      }
+      
+      // Trigger refresh of movie cards
+      onStatusChange?.();
+    } catch (error) {
+      console.error('Error updating watchlist:', error);
     }
-    
-    setSavedMovies(updatedSaved);
-    await saveUserData('savedMovies', updatedSaved);
   };
 
   const handleMarkAsWatched = async () => {
     if (!movieData) return;
 
-    const movieId = movieData.id;
-    const isWatched = watchedMovies.includes(movieId);
-    
-    let updatedWatched;
-    if (isWatched) {
-      updatedWatched = watchedMovies.filter(id => id !== movieId);
-    } else {
-      updatedWatched = [...watchedMovies, movieId];
+    try {
+      const movieItem = {
+        id: Date.now(),
+        movieId: movieData.id,
+        title: movieData.title,
+        poster_path: movieData.poster_path || '',
+        vote_average: movieData.vote_average,
+        release_date: movieData.release_date,
+        addedAt: new Date().toISOString()
+      };
+
+      if (isWatchedMovie) {
+        await removeFromWatched(movieData.id);
+        setIsWatchedMovie(false);
+      } else {
+        await markAsWatched(movieItem);
+        setIsWatchedMovie(true);
+      }
+      
+      // Trigger refresh of movie cards
+      onStatusChange?.();
+    } catch (error) {
+      console.error('Error updating watched status:', error);
     }
-    
-    setWatchedMovies(updatedWatched);
-    await saveUserData('watchedMovies', updatedWatched);
   };
 
   const handleShare = async () => {
@@ -192,29 +236,29 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
   const options = [
     {
       id: 'favorite',
-      title: movieData && favorites.includes(movieData.id) ? 'Remove from Favorites' : 'Add to Favorites',
-      icon: movieData && favorites.includes(movieData.id) ? 'heart' : 'heart-outline',
+      title: inFavorites ? 'Remove from Favorites' : 'Add to Favorites',
+      icon: inFavorites ? 'heart' : 'heart-outline',
       iconLibrary: 'Ionicons' as const,
-      color: movieData && favorites.includes(movieData.id) ? '#AB8BFF' : '#6B7280',
-      isActive: movieData && favorites.includes(movieData.id),
+      color: inFavorites ? '#AB8BFF' : '#6B7280',
+      isActive: inFavorites,
       onPress: handleAddToFavorites
     },
     {
       id: 'save',
-      title: movieData && savedMovies.includes(movieData.id) ? 'Remove from Saved' : 'Save for Later',
-      icon: movieData && savedMovies.includes(movieData.id) ? 'bookmark' : 'bookmark-outline',
+      title: inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist',
+      icon: inWatchlist ? 'bookmark' : 'bookmark-outline',
       iconLibrary: 'Ionicons' as const,
-      color: movieData && savedMovies.includes(movieData.id) ? '#AB8BFF' : '#6B7280',
-      isActive: movieData && savedMovies.includes(movieData.id),
+      color: inWatchlist ? '#AB8BFF' : '#6B7280',
+      isActive: inWatchlist,
       onPress: handleSaveMovie
     },
     {
       id: 'watched',
-      title: movieData && watchedMovies.includes(movieData.id) ? 'Mark as Unwatched' : 'Mark as Watched',
-      icon: movieData && watchedMovies.includes(movieData.id) ? 'checkmark-circle' : 'checkmark-circle-outline',
+      title: isWatchedMovie ? 'Mark as Unwatched' : 'Mark as Watched',
+      icon: isWatchedMovie ? 'checkmark-circle' : 'checkmark-circle-outline',
       iconLibrary: 'Ionicons' as const,
-      color: movieData && watchedMovies.includes(movieData.id) ? '#AB8BFF' : '#6B7280',
-      isActive: movieData && watchedMovies.includes(movieData.id),
+      color: isWatchedMovie ? '#AB8BFF' : '#6B7280',
+      isActive: isWatchedMovie,
       onPress: handleMarkAsWatched
     },
     {
