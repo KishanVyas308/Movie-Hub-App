@@ -1,7 +1,7 @@
-import MovieCard from '@/components/MovieCard'
-import SearchBar from '@/components/SearchBar'
+import EnhancedMovieCard from '@/components/EnhancedMovieCard'
 import FilterModal from '@/components/FilterModal'
 import PersonCard from '@/components/PersonCard'
+import SearchBar from '@/components/SearchBar'
 import { icons } from '@/constants/icons'
 import { images } from '@/constants/images'
 import { fetchMoviesWithFilters, searchPeople } from '@/services/api'
@@ -78,10 +78,10 @@ const Search = () => {
       <Image source={images.bg} className='flex-1 absolute w-full z-0' resizeMode='cover' />
 
       <FlatList 
-        data={currentData} 
+        data={currentData && currentData.length > 0 ? currentData : []} 
         renderItem={({ item }) => (
           searchMode === 'movies' ? (
-            <MovieCard {...item} />
+            <EnhancedMovieCard  {...item} isFromSearchPage={true} showActions={true} />
           ) : (
             <PersonCard person={item} />
           )
@@ -103,14 +103,15 @@ const Search = () => {
         }}
         ListHeaderComponent={
           <>
-            <View className='w-full flex-row justify-center mt-20' >
+            {/* <View className='w-full flex-row justify-center mt-20' >
               <Image source={icons.logo} className='w-12 h-10' />
-            </View>
+            </View> */}
             
-            <View className='my-5'>
+            <View className='mt-16 mb-5'>
               <SearchBar
                 placeholder={searchMode === 'movies' ? 'Search Movies...' : 'Search People...'}
                 value={searchQuery}
+                autoFocus={true}
                 onChangeText={(text: any) => setSearchQuery(text)}
               />
             </View>
@@ -200,7 +201,7 @@ const Search = () => {
               </View>
             }
 
-            {!currentLoading && !currentError && searchQuery.trim() && currentData?.length > 0 && (
+            {!currentLoading && !currentError && searchQuery.trim() && currentData && currentData?.length > 0 && (
               <Text className='text-xl text-white font-bold mb-4'>
                 {searchMode === 'movies' ? 'Movies' : 'People'} for {" "}
                 <Text className='text-accent'>{searchQuery.trim()}</Text>
