@@ -10,6 +10,7 @@ interface MovieActionsProps {
   onWatchlistToggle: () => void;
   onFavoriteToggle: () => void;
   onWatchedToggle: () => void;
+  movieId?: number;
   movieTitle?: string;
 }
 
