@@ -1,10 +1,10 @@
 import {
   fetchMovieCredits,
   fetchMovieDetails,
+  fetchMovieImages,
   fetchMovieReviews,
   fetchMovieVideos,
-  fetchSimilarMovies,
-  fetchMovieImages
+  fetchSimilarMovies
 } from '@/services/api'
 import {
   addToFavorites,
@@ -14,12 +14,12 @@ import {
   isWatched,
   markAsWatched,
   removeFromFavorites,
-  removeFromWatchlist,
-  removeFromWatched
+  removeFromWatched,
+  removeFromWatchlist
 } from '@/services/storage'
 import useFetch from '@/services/useFetch'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import React, { useCallback, useEffect, useState, memo } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -30,17 +30,17 @@ import {
 } from 'react-native'
 
 // Import modular components
+import BoxOfficeSection from '@/components/MovieDetailComponents/BoxOfficeSection'
+import CastSection from '@/components/MovieDetailComponents/CastSection'
+import ImageModal from '@/components/MovieDetailComponents/ImageModal'
+import ImagesSection from '@/components/MovieDetailComponents/ImagesSection'
+import MovieActions from '@/components/MovieDetailComponents/MovieActions'
 import MovieHero from '@/components/MovieDetailComponents/MovieHero'
 import MovieInfo from '@/components/MovieDetailComponents/MovieInfo'
-import MovieActions from '@/components/MovieDetailComponents/MovieActions'
 import MovieOverview from '@/components/MovieDetailComponents/MovieOverview'
-import VideosSection from '@/components/MovieDetailComponents/VideosSection'
-import ImagesSection from '@/components/MovieDetailComponents/ImagesSection'
-import CastSection from '@/components/MovieDetailComponents/CastSection'
 import ReviewsSection from '@/components/MovieDetailComponents/ReviewsSection'
-import BoxOfficeSection from '@/components/MovieDetailComponents/BoxOfficeSection'
 import SimilarMoviesSection from '@/components/MovieDetailComponents/SimilarMoviesSection'
-import ImageModal from '@/components/MovieDetailComponents/ImageModal'
+import VideosSection from '@/components/MovieDetailComponents/VideosSection'
 
 const MovieDetails = () => {
   const { id } = useLocalSearchParams()
@@ -209,21 +209,11 @@ const MovieDetails = () => {
       if (watched) {
         // Remove from watched
         await removeFromWatched(movie.id)
-        Alert.alert(
-          'Success', 
-          'Movie removed from watched history!',
-          [{ text: 'OK', style: 'default' }]
-        )
       } else {
         // Mark as watched
         const movieData = createMovieData()
         if (movieData) {
           await markAsWatched(movieData)
-          Alert.alert(
-            'Success', 
-            'Movie marked as watched!',
-            [{ text: 'OK', style: 'default' }]
-          )
         } else {
           throw new Error('Failed to create movie data')
         }
@@ -340,7 +330,7 @@ const MovieDetails = () => {
             onGenrePress={handleGenrePress}
           />
 
-          {/* Action Buttons */}
+          {/* Action Buttons and Where To Watch */}
           <MovieActions
             inWatchlist={inWatchlist}
             inFavorites={inFavorites}
@@ -349,6 +339,8 @@ const MovieDetails = () => {
             onWatchlistToggle={handleWatchlistToggle}
             onFavoriteToggle={handleFavoriteToggle}
             onWatchedToggle={handleWatchedToggle}
+            movieId={movie?.id}
+            movieTitle={movie.title}
           />
 
           {/* Movie Overview */}

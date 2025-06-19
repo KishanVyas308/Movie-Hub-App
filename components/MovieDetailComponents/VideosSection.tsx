@@ -126,7 +126,7 @@ const VideosSection = ({ videos, loading, onVideoPress }: VideosSectionProps) =>
   });
 
   const mainVideo = sortedVideos[0];
-  const otherVideos = sortedVideos.slice(1, 11); // Show up to 10 additional videos
+  const otherVideos = sortedVideos.slice(1, videos.length); // Show all additional videos
 
   return (
     <View className='mb-8'>
