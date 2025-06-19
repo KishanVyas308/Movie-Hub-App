@@ -158,12 +158,13 @@ export default function Index() {
           <View className="flex-1 mt-20">
             {/* Header with Logo and Options Menu */}
             <View className='flex-row items-center justify-between mb-5 px-2'>
-              <View className='flex-1' />
+             
               <View className='flex-row items-center justify-center flex-1'>
                 <Image source={icons.logo} className='w-12 h-10' />
               </View>
              
             </View>
+            
             <SearchBar
               onPress={() => router.push('/search')}
               placeholder="Search Movies"

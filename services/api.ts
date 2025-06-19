@@ -233,12 +233,24 @@ export const fetchNowPlayingMovies = async (page: number = 1): Promise<Movie[]> 
 };
 
 // Advanced search with filters
-export const fetchMoviesWithFilters = async (filters: MovieFilters): Promise<Movie[]> => {
+export const fetchMoviesWithFilters = async (filters: MovieFilters): Promise<{
+    results: Movie[];
+    page: number;
+    total_pages: number;
+    total_results: number;
+}> => {
     try {
         const params = new URLSearchParams();
         
         if (filters.query) params.append('query', filters.query);
-        if (filters.genre) params.append('with_genres', filters.genre.toString());
+        
+        // Handle multiple genres
+        if (filters.genres && filters.genres.length > 0) {
+            params.append('with_genres', filters.genres.join(','));
+        } else if (filters.genre) {
+            params.append('with_genres', filters.genre.toString());
+        }
+        
         if (filters.year) params.append('year', filters.year.toString());
         if (filters.sortBy) params.append('sort_by', filters.sortBy);
         if (filters.minRating) params.append('vote_average.gte', filters.minRating.toString());
@@ -258,7 +270,12 @@ export const fetchMoviesWithFilters = async (filters: MovieFilters): Promise<Mov
 
         if (!response.ok) throw new Error(`Error fetching filtered movies: ${response.statusText}`);
         const data = await response.json();
-        return data.results;
+        return {
+            results: data.results,
+            page: data.page,
+            total_pages: data.total_pages,
+            total_results: data.total_results
+        };
     } catch (error) {
         console.log('Error fetching filtered movies:', error);
         throw error;

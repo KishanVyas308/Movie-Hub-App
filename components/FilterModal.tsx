@@ -21,7 +21,7 @@ interface FilterModalProps {
 
 const FilterModal = ({ visible, onClose, onApplyFilters, initialFilters }: FilterModalProps) => {
   const [filters, setFilters] = useState<MovieFilters>(initialFilters || {});
-  const [selectedGenre, setSelectedGenre] = useState<number | undefined>(initialFilters?.genre);
+  const [selectedGenres, setSelectedGenres] = useState<number[]>(initialFilters?.genres || []);
   const [year, setYear] = useState(initialFilters?.year?.toString() || '');
   const [minRating, setMinRating] = useState(initialFilters?.minRating?.toString() || '');
   const [maxRating, setMaxRating] = useState(initialFilters?.maxRating?.toString() || '');
@@ -43,7 +43,7 @@ const FilterModal = ({ visible, onClose, onApplyFilters, initialFilters }: Filte
   const handleApplyFilters = () => {
     const newFilters: MovieFilters = {
       ...filters,
-      genre: selectedGenre,
+      genres: selectedGenres.length > 0 ? selectedGenres : undefined,
       year: year ? parseInt(year) : undefined,
       minRating: minRating ? parseFloat(minRating) : undefined,
       maxRating: maxRating ? parseFloat(maxRating) : undefined,
@@ -77,13 +77,23 @@ const FilterModal = ({ visible, onClose, onApplyFilters, initialFilters }: Filte
   };
 
   const handleClearFilters = () => {
-    setSelectedGenre(undefined);
+    setSelectedGenres([]);
     setYear('');
     setMinRating('');
     setMaxRating('');
     setSortBy('popularity.desc');
     onApplyFilters({});
     onClose();
+  };
+
+  const handleGenreToggle = (genreId: number) => {
+    setSelectedGenres(prev => {
+      if (prev.includes(genreId)) {
+        return prev.filter(id => id !== genreId);
+      } else {
+        return [...prev, genreId];
+      }
+    });
   };
 
   return (
@@ -132,7 +142,7 @@ const FilterModal = ({ visible, onClose, onApplyFilters, initialFilters }: Filte
 
           {/* Genres */}
           <View className='mb-6'>
-            <Text className='text-white text-lg font-bold mb-3'>Genre</Text>
+            <Text className='text-white text-lg font-bold mb-3'>Genres (Multiple Selection)</Text>
             {genresLoading ? (
               <Text className='text-light-200'>Loading genres...</Text>
             ) : (
@@ -141,8 +151,8 @@ const FilterModal = ({ visible, onClose, onApplyFilters, initialFilters }: Filte
                   <GenreChip
                     key={genre.id}
                     genre={genre}
-                    selected={selectedGenre === genre.id}
-                    onPress={(g) => setSelectedGenre(selectedGenre === g.id ? undefined : g.id)}
+                    selected={selectedGenres.includes(genre.id)}
+                    onPress={() => handleGenreToggle(genre.id)}
                   />
                 ))}
               </View>
