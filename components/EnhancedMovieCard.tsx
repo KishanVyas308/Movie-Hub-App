@@ -1,5 +1,6 @@
 import { icons } from '@/constants/icons';
 import { addToFavorites, addToWatchlist, isFavorite, isInWatchlist, removeFromFavorites, removeFromWatchlist } from '@/services/storage';
+import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
@@ -133,31 +134,33 @@ const EnhancedMovieCard = ({
 
       {showActions && (
         <View className='flex-row justify-between mt-2'>
-          <TouchableOpacity
+            <TouchableOpacity
             onPress={handleWatchlistToggle}
             disabled={loading}
             className={`flex-1 mr-1 py-2 rounded-md items-center ${
               inWatchlist ? 'bg-accent' : 'bg-dark-100'
             }`}
-          >
-            <Image 
-              source={icons.save} 
-              className='w-4 h-4' 
-              tintColor={inWatchlist ? 'white' : '#9CA3AF'} 
+            >
+            <Ionicons 
+              name={inWatchlist ? "bookmark" : "bookmark-outline"} 
+              size={16} 
+              color={inWatchlist ? 'white' : '#9CA3AF'} 
             />
-          </TouchableOpacity>
-          
-          <TouchableOpacity
+            </TouchableOpacity>
+            
+            <TouchableOpacity
             onPress={handleFavoriteToggle}
             disabled={loading}
             className={`flex-1 ml-1 py-2 rounded-md items-center ${
               inFavorites ? 'bg-red-600' : 'bg-dark-100'
             }`}
-          >
-            <Text className={`text-lg ${inFavorites ? 'text-white' : 'text-gray-400'}`}>
-              ♥
-            </Text>
-          </TouchableOpacity>
+            >
+            <Ionicons 
+              name={inFavorites ? "heart" : "heart-outline"} 
+              size={16} 
+              color={inFavorites ? 'white' : '#9CA3AF'} 
+            />
+            </TouchableOpacity>
         </View>
       )}
     </View>

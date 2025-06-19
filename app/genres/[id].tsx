@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  TouchableOpacity, 
-  Image, 
-  ActivityIndicator 
-} from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { icons } from '@/constants/icons'
+import EnhancedMovieCard from '@/components/EnhancedMovieCard'
 import { images } from '@/constants/images'
 import { fetchMoviesByGenre } from '@/services/api'
 import useFetch from '@/services/useFetch'
-import EnhancedMovieCard from '@/components/EnhancedMovieCard'
+import { Ionicons } from '@expo/vector-icons'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 
 const GenreMoviesPage = () => {
   const { id, name } = useLocalSearchParams()
@@ -44,7 +44,7 @@ const GenreMoviesPage = () => {
   }
 
   const renderMovieItem = ({ item }: { item: Movie }) => (
-    <EnhancedMovieCard {...item} />
+    <EnhancedMovieCard {...item} isFromSearchPage={true} />
   )
 
   const renderFooter = () => {
@@ -67,8 +67,8 @@ const GenreMoviesPage = () => {
           onPress={() => router.back()}
           className='flex-row items-center mb-4'
         >
-          <Image source={icons.arrow} className='w-6 h-6 mr-2' tintColor='white' />
-          <Text className='text-white font-medium'>Back to Genres</Text>
+           <Ionicons name="arrow-back" size={24} color="white" />
+          <Text className='text-white text-2xl ml-4 font-bold'>Back to Genres</Text>
         </TouchableOpacity>
         
         <Text className='text-white text-2xl font-bold'>
