@@ -339,6 +339,8 @@ const MovieDetails = () => {
             onWatchlistToggle={handleWatchlistToggle}
             onFavoriteToggle={handleFavoriteToggle}
             onWatchedToggle={handleWatchedToggle}
+            movieId={movie.id}
+            movieTitle={movie.title}
           />
 
           {/* Movie Overview */}

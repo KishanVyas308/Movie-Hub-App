@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Text, TouchableOpacity, View } from 'react-native';
 
 interface MovieActionsProps {
   inWatchlist: boolean;
@@ -10,6 +10,14 @@ interface MovieActionsProps {
   onWatchlistToggle: () => void;
   onFavoriteToggle: () => void;
   onWatchedToggle: () => void;
+  movieTitle?: string;
+}
+
+interface StreamingPlatform {
+  name: string;
+  icon: string;
+  color: string;
+  url: string;
 }
 
 const MovieActions = ({
@@ -19,7 +27,8 @@ const MovieActions = ({
   actionLoading,
   onWatchlistToggle,
   onFavoriteToggle,
-  onWatchedToggle
+  onWatchedToggle,
+  movieTitle = "this movie"
 }: MovieActionsProps) => {
   const [pressedButton, setPressedButton] = useState<string | null>(null);
 
@@ -28,6 +37,69 @@ const MovieActions = ({
     setPressedButton(buttonType);
     setTimeout(() => setPressedButton(null), 150);
     action();
+  };
+
+  // Popular streaming platforms
+  const streamingPlatforms: StreamingPlatform[] = [
+    {
+      name: "Netflix",
+      icon: "play-circle",
+      color: "#E50914",
+      url: "https://www.netflix.com/search?q="
+    },
+    {
+      name: "Disney+",
+      icon: "play-circle",
+      color: "#113CCF",
+      url: "https://www.disneyplus.com/search?q="
+    },
+    {
+      name: "Prime Video",
+      icon: "play-circle",
+      color: "#00A8E1",
+      url: "https://www.primevideo.com/search/ref=atv_nb_sr?phrase="
+    },
+    {
+      name: "Hotstar",
+      icon: "play-circle",
+      color: "#1F80E0",
+      url: "https://www.hotstar.com/in/search?q="
+    },
+    {
+      name: "Hulu",
+      icon: "play-circle",
+      color: "#1CE783",
+      url: "https://www.hulu.com/search?q="
+    },
+    {
+      name: "HBO Max",
+      icon: "play-circle",
+      color: "#8B5CF6",
+      url: "https://www.hbomax.com/search?q="
+    }
+  ];
+
+  const handleStreamingPress = async (platform: StreamingPlatform) => {
+    try {
+      const searchUrl = `${platform.url}${encodeURIComponent(movieTitle)}`;
+      const supported = await Linking.canOpenURL(searchUrl);
+      
+      if (supported) {
+        await Linking.openURL(searchUrl);
+      } else {
+        Alert.alert(
+          'Unable to Open',
+          `Cannot open ${platform.name}. Please make sure the app is installed.`,
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        `Failed to open ${platform.name}. Please try again.`,
+        [{ text: 'OK' }]
+      );
+    }
   };
 
  
@@ -139,7 +211,46 @@ const MovieActions = ({
         </TouchableOpacity>
       </View>
 
-  
+      {/* Where to Watch Section */}
+      <View className='mt-6'>
+        <Text className='text-white text-lg font-bold mb-3'>Where to Watch</Text>
+        <View className='flex-row flex-wrap justify-center gap-3'>
+          {streamingPlatforms.map((platform, index) => (
+            <TouchableOpacity
+              key={platform.name}
+              onPress={() => handleStreamingPress(platform)}
+              className='flex-row items-center justify-center w-[48%] bg-dark-100 px-4 py-3 rounded-lg border border-dark-200 transition-all duration-200 '
+            
+            >
+              <Ionicons 
+                name={platform.icon as any}
+                size={20} 
+                color={platform.color}
+                style={{ marginRight: 8 }}
+              />
+              <Text className='text-white font-medium text-sm flex-1'>
+                {platform.name}
+              </Text>
+              <Ionicons 
+                name="open-outline" 
+                size={16} 
+                color="#9CA3AF" 
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+        
+        {/* Watch Note */}
+        <View className='mt-4 p-3 bg-dark-100/50 rounded-lg border border-dark-200'>
+          <View className='flex-row items-center mb-1'>
+            <Ionicons name="information-circle-outline" size={16} color="#9CA3AF" style={{ marginRight: 6 }} />
+            <Text className='text-light-300 text-xs font-medium'>Note</Text>
+          </View>
+          <Text className='text-light-300 text-xs leading-4'>
+            Availability may vary by region. Tapping will search for "{movieTitle}" on the respective platform.
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };
