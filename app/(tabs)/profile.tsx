@@ -247,12 +247,17 @@ const Profile = () => {
 
   const handleShareApp = useCallback(async () => {
     try {
+      // Replace this with your actual package name from Google Play Store
+      const appPackageName = 'com.your.package.name';
+      const playStoreLink = `https://play.google.com/store/apps/details?id=${appPackageName}`;
+      
       await Share.share({
-        message: 'Check out this amazing Movie Hub app! Track your movies, create watchlists, and discover new films. 🎬✨',
+        message: `Check out this amazing Movie Hub app! Track your movies, create watchlists, and discover new films. 🎬✨\n\nDownload now: ${playStoreLink}`,
         title: 'Movie Hub App'
-      })
+      });
     } catch (error) {
-      console.error('Error sharing app:', error)
+      console.error('Error sharing app:', error);
+      Alert.alert('Error', 'Could not share the app');
     }
   }, [])
 
