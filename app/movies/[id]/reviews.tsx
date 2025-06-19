@@ -1,18 +1,18 @@
-import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  ActivityIndicator,
-  ScrollView,
-  TextInput
-} from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { icons } from '@/constants/icons';
 import { fetchMovieReviews } from '@/services/api';
 import useFetch from '@/services/useFetch';
-import { icons } from '@/constants/icons';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 const ReviewCard = ({ review }: { review: MovieReview }) => {
   const [expanded, setExpanded] = useState(false);
@@ -211,7 +211,7 @@ const ViewAllReviews = () => {
       {/* Header */}
       <View className='flex-row items-center px-5 pt-12 pb-4'>
         <TouchableOpacity onPress={() => router.back()} className='mr-4'>
-          <Image source={icons.arrow} className='w-6 h-6' tintColor='white' />
+           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text className='text-white text-xl font-bold'>Reviews</Text>
       </View>
