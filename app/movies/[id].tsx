@@ -209,21 +209,11 @@ const MovieDetails = () => {
       if (watched) {
         // Remove from watched
         await removeFromWatched(movie.id)
-        Alert.alert(
-          'Success', 
-          'Movie removed from watched history!',
-          [{ text: 'OK', style: 'default' }]
-        )
       } else {
         // Mark as watched
         const movieData = createMovieData()
         if (movieData) {
           await markAsWatched(movieData)
-          Alert.alert(
-            'Success', 
-            'Movie marked as watched!',
-            [{ text: 'OK', style: 'default' }]
-          )
         } else {
           throw new Error('Failed to create movie data')
         }

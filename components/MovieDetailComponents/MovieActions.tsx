@@ -1,5 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
 interface MovieActionsProps {
   inWatchlist: boolean;
@@ -29,144 +30,116 @@ const MovieActions = ({
     action();
   };
 
-  const ActionButton = ({ 
-    type, 
-    isActive, 
-    icon, 
-    activeIcon, 
-    title, 
-    subtitle, 
-    onPress, 
-    activeColor = '#FF6B35',
-    inactiveColor = '#6B7280'
-  }: {
-    type: string;
-    isActive: boolean;
-    icon: any;
-    activeIcon?: any;
-    title: string;
-    subtitle: string;
-    onPress: () => void;
-    activeColor?: string;
-    inactiveColor?: string;
-  }) => (
-    <TouchableOpacity
-      onPress={() => handlePress(type, onPress)}
-      disabled={actionLoading}
-      className={`flex-1 p-4 rounded-xl border-2 ${
-        isActive 
-          ? 'bg-white/5 border-white/20' 
-          : 'bg-transparent border-white/10'
-      }`}
-      style={{
-        transform: [{ scale: pressedButton === type ? 0.95 : 1 }],
-        shadowColor: isActive ? activeColor : '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: isActive ? 0.2 : 0.1,
-        shadowRadius: 4,
-        elevation: isActive ? 4 : 2,
-      }}
-    >
-      <View className='items-center'>
-        {actionLoading && pressedButton === type ? (
-          <View className='w-8 h-8 items-center justify-center mb-2'>
-            <ActivityIndicator size="small" color={isActive ? activeColor : inactiveColor} />
-          </View>
-        ) : (
-          <View 
-            className={`w-8 h-8 rounded-full items-center justify-center mb-2 ${
-              isActive ? 'bg-white/20' : 'bg-white/5'
-            }`}
-          >
-            <Image 
-              source={isActive && activeIcon ? activeIcon : icon} 
-              className='w-5 h-5' 
-              tintColor={isActive ? activeColor : inactiveColor} 
-            />
-          </View>
-        )}
-        
-        <Text className={`font-semibold text-sm text-center mb-1 ${
-          isActive ? 'text-white' : 'text-light-200'
-        }`}>
-          {title}
-        </Text>
-        
-        <Text className={`text-xs text-center ${
-          isActive ? 'text-white/70' : 'text-light-200/70'
-        }`}>
-          {subtitle}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+ 
 
   return (
     <View className='mb-8'>
       {/* Main Actions */}
       <View className='flex-row gap-3 mb-4'>
-        <ActionButton
-          type="watchlist"
-          isActive={inWatchlist}
-          icon={{ uri: 'https://example.com/icons/bookmark.png' }}
-          title={inWatchlist ? 'In Watchlist' : 'Watchlist'}
-          subtitle={inWatchlist ? 'Remove' : 'Add to list'}
-          onPress={onWatchlistToggle}
-          activeColor="#FF6B35"
-        />
-        
-        <ActionButton
-          type="favorites"
-          isActive={inFavorites}
-          icon={{ uri: 'https://example.com/icons/heart.png' }}
-          title={inFavorites ? 'Favorited' : 'Favorite'}
-          subtitle={inFavorites ? 'Remove' : 'Add to favorites'}
-          onPress={onFavoriteToggle}
-          activeColor="#EF4444"
-        />
-        
-        <ActionButton
-          type="watched"
-          isActive={watched}
-          icon={{ uri: 'https://example.com/icons/check.png' }}
-          title={watched ? 'Watched' : 'Watch'}
-          subtitle={watched ? 'Unmark' : 'Mark as watched'}
-          onPress={onWatchedToggle}
-          activeColor="#10B981"
-        />
+        {/* Watchlist Button */}
+        <TouchableOpacity
+          onPress={() => handlePress('watchlist', onWatchlistToggle)}
+          disabled={actionLoading}
+          className={`flex-1 py-4 px-4 rounded-xl items-center justify-center border-2 ${
+            inWatchlist 
+              ? 'bg-accent border-accent' 
+              : 'bg-dark-100 border-dark-100'
+          } ${
+            pressedButton === 'watchlist' ? 'opacity-70' : ''
+          }`}
+        >
+          <View className='flex-row items-center h-5'>
+            {actionLoading && pressedButton === 'watchlist' ? (
+              <ActivityIndicator size="small" color="white" className='absolute' />
+            ) : (
+              <>
+                <Ionicons 
+                  name={inWatchlist ? "bookmark" : "bookmark-outline"} 
+                  size={16} 
+                  color={inWatchlist ? "white" : "#9CA3AF"} 
+                  style={{ marginRight: 4 }} 
+                />
+                <Text className={`font-semibold ${
+                  inWatchlist ? 'text-white' : 'text-light-300'
+                }`}>
+                  {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
+                </Text>
+              </>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
 
-      {/* Status Indicator */}
-      <View className='bg-white/5 rounded-xl p-4 border border-white/10'>
-        <View className='flex-row items-center justify-between'>
-          <Text className='text-white font-medium text-sm'>Movie Status</Text>
-          <View className='flex-row items-center gap-4'>
-            {/* Watchlist Status */}
-            <View className='flex-row items-center'>
-              <View className={`w-2 h-2 rounded-full mr-2 ${
-                inWatchlist ? 'bg-orange-500' : 'bg-gray-500'
-              }`} />
-              <Text className='text-light-200 text-xs'>Watchlist</Text>
-            </View>
-            
-            {/* Favorites Status */}
-            <View className='flex-row items-center'>
-              <View className={`w-2 h-2 rounded-full mr-2 ${
-                inFavorites ? 'bg-red-500' : 'bg-gray-500'
-              }`} />
-              <Text className='text-light-200 text-xs'>Favorite</Text>
-            </View>
-            
-            {/* Watched Status */}
-            <View className='flex-row items-center'>
-              <View className={`w-2 h-2 rounded-full mr-2 ${
-                watched ? 'bg-green-500' : 'bg-gray-500'
-              }`} />
-              <Text className='text-light-200 text-xs'>Watched</Text>
-            </View>
+      {/* Secondary Actions */}
+      <View className='flex-row gap-3'>
+        {/* Favorites Button */}
+        <TouchableOpacity
+          onPress={() => handlePress('favorites', onFavoriteToggle)}
+          disabled={actionLoading}
+          className={`flex-1 py-3 px-4 rounded-lg items-center justify-center border border-solid ${
+            inFavorites 
+              ? 'bg-red-500 ' 
+              : 'bg-dark-100 '
+          } ${
+            pressedButton === 'favorites' ? 'opacity-70' : ''
+          }`}
+        >
+          <View className='flex-row items-center'>
+            {actionLoading && pressedButton === 'favorites' ? (
+              <ActivityIndicator size="small" color="white" className='absolute' />
+            ) : (
+                <>
+                <Ionicons 
+                  name={inFavorites ? "heart" : "heart-outline"} 
+                  size={18} 
+                  color={inFavorites ? "white" : "#9CA3AF"} 
+                  style={{ marginRight: 4 }} 
+                />
+                <Text className={`font-medium text-sm ${
+                  inFavorites ? 'text-white' : 'text-light-300'
+                }`}>
+                  {inFavorites ? 'Favorited' : 'Favorite'}
+                </Text>
+                </>
+            )}
           </View>
-        </View>
+        </TouchableOpacity>
+
+        {/* Watched Button */}
+        <TouchableOpacity
+          onPress={() => handlePress('watched', onWatchedToggle)}
+          disabled={actionLoading}
+          className={`flex-1 py-3 px-4 rounded-lg items-center justify-center ${
+            watched 
+              ? 'bg-green-600' 
+              : 'bg-dark-100'
+          } ${
+            pressedButton === 'watched' ? 'opacity-70' : ''
+          }`}
+        >
+          <View className='flex-row items-center'>
+            {actionLoading && pressedButton === 'watched' ? (
+              <ActivityIndicator size="small" color="white" className='absolute'  />
+            ) : (
+              <>
+                <Ionicons 
+                  name={watched ? "checkmark-circle" : "checkmark-circle-outline"} 
+                  size={18} 
+                  color={watched ? "white" : "#9CA3AF"} 
+                  style={{ marginRight: 4 }} 
+                />
+                <Text className={`font-medium text-sm ${
+                  watched ? 'text-white' : 'text-light-300'
+                }`}>
+                  {watched ? 'Watched' : 'Mark Watched'}
+                </Text>
+              </>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
+
+  
     </View>
   );
 };
