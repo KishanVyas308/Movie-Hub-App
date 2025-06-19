@@ -162,11 +162,18 @@ interface MovieReviews {
 interface MovieFilters {
   query?: string;
   genre?: number;
+  genres?: number[];
   year?: number;
   sortBy?: string;
   minRating?: number;
   maxRating?: number;
   page?: number;
+}
+
+interface PeopleFilters {
+  sortBy?: string;
+  department?: string;
+  gender?: number;
 }
 
 interface WatchlistItem {

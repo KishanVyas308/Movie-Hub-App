@@ -1,13 +1,13 @@
+import { icons } from '@/constants/icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Image,
   Text,
   TouchableOpacity,
-  Image,
-  ActivityIndicator
+  View
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { icons } from '@/constants/icons';
 
 interface PersonCardProps {
   person: SearchPerson;
@@ -40,7 +40,7 @@ const PersonCard = ({ person, size = 'medium' }: PersonCardProps) => {
   const cardSize = getCardSize();
 
   return (
-    <TouchableOpacity onPress={handlePress} className='mr-4 mb-4'>
+    <TouchableOpacity onPress={handlePress} className='px-2 mb-4 w-[30%]'>
       <View className='items-center'>
         {/* Profile Image */}
         <View className={`relative rounded-xl overflow-hidden shadow-lg mb-2 ${cardSize.width} ${cardSize.height}`}>
