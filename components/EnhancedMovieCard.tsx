@@ -8,6 +8,7 @@ import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 interface EnhancedMovieCardProps extends Movie {
   showActions?: boolean;
   isFromSearchPage?: boolean;
+  onOptionsPress?: (movie: Movie) => void;
 }
 
 const EnhancedMovieCard = ({ 
@@ -17,7 +18,9 @@ const EnhancedMovieCard = ({
   vote_average, 
   release_date,
   showActions = true,
-  isFromSearchPage = false
+  isFromSearchPage = false,
+  onOptionsPress,
+  ...movieData
 }: EnhancedMovieCardProps) => {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [inFavorites, setInFavorites] = useState(false);
@@ -100,21 +103,51 @@ const EnhancedMovieCard = ({
     }
   };
 
+  const handleOptionsPress = () => {
+    if (onOptionsPress) {
+      const fullMovieData: Movie = {
+        id,
+        poster_path,
+        title,
+        vote_average,
+        release_date,
+        ...movieData
+      };
+      onOptionsPress(fullMovieData);
+    }
+  };
+
   return (
     <View className={` ${isFromSearchPage ? 'w-[30%]' : 'min-w-[30%]' }  mb-4`}>
-      <Link href={`/movies/${id}`} asChild>
-        <TouchableOpacity className=''>
-          <Image
-            source={{
-              uri: poster_path 
-                ? `https://image.tmdb.org/t/p/w500${poster_path}`
-                : 'https://via.placeholder.com/500x750?text=No+Image+Available'
-            }}
-            className='w-full h-52 rounded-lg'
-            resizeMode='cover'
-          />
-        </TouchableOpacity>
-      </Link>
+      <View className='relative'>
+        <Link href={`/movies/${id}`} asChild>
+          <TouchableOpacity className=''>
+            <Image
+              source={{
+                uri: poster_path 
+                  ? `https://image.tmdb.org/t/p/w500${poster_path}`
+                  : 'https://via.placeholder.com/500x750?text=No+Image+Available'
+              }}
+              className='w-full h-52 rounded-lg'
+              resizeMode='cover'
+            />
+          </TouchableOpacity>
+        </Link>
+        
+        {/* Options Menu Button */}
+        {onOptionsPress && (
+          <TouchableOpacity 
+            onPress={handleOptionsPress}
+            className='absolute top-2 right-2 p-2 rounded-full bg-black/60'
+          >
+            <View className='flex-col '>
+              <View className='w-1 h-1 bg-white rounded-full my-0.5' />
+              <View className='w-1 h-1 bg-white rounded-full my-0.5' />
+              <View className='w-1 h-1 bg-white rounded-full my-0.5' />
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
 
       <Text className='text-white text-sm font-bold mt-2' numberOfLines={1}>
         {title}
