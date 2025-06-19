@@ -31,9 +31,10 @@ interface MovieSectionProps {
   onSeeAll?: () => void;
   onOptionsPress?: (movie: Movie) => void;
   refreshTrigger?: number;
+  updatedMovieIds?: Set<number>;
 }
 
-const MovieSection = ({ title, movies, loading, onSeeAll, onOptionsPress, refreshTrigger }: MovieSectionProps) => {
+const MovieSection = ({ title, movies, loading, onSeeAll, onOptionsPress, refreshTrigger, updatedMovieIds }: MovieSectionProps) => {
   if (loading) {
     return (
       <View className="mt-6">
@@ -58,17 +59,24 @@ const MovieSection = ({ title, movies, loading, onSeeAll, onOptionsPress, refres
       
       <FlatList
         data={movies.slice(0, 6)}
-        renderItem={({ item }) => (
-          <View className="mr-4 w-32">
-            <EnhancedMovieCard {...item} showActions={false} onOptionsPress={onOptionsPress} refreshTrigger={refreshTrigger} />
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const isUpdated = updatedMovieIds?.has(item.id) || false;
+          return (
+            <View className={`mr-4 w-32 ${isUpdated ? 'opacity-80' : ''}`}>
+              <EnhancedMovieCard 
+                {...item} 
+                showActions={false} 
+                onOptionsPress={onOptionsPress} 
+                refreshTrigger={refreshTrigger}
+              />
+            </View>
+          );
+        }}
         keyExtractor={(item) => item.id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingRight: 20 }}
-        
-        
+        extraData={refreshTrigger} // Force re-render when refreshTrigger changes
       />
     </View>
   );
@@ -79,20 +87,21 @@ export default function Index() {
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [updatedMovieIds, setUpdatedMovieIds] = useState<Set<number>>(new Set());
 
-  const { data: popularMovies, loading: popularLoading, error: popularError } = 
+  const { data: popularMovies, loading: popularLoading, error: popularError, refetch: refetchPopular } = 
     useFetch(() => fetchMovies({ query: '' }));
   
-  const { data: trendingMovies, loading: trendingLoading } = 
+  const { data: trendingMovies, loading: trendingLoading, refetch: refetchTrending } = 
     useFetch(() => fetchTrendingMovies('week'));
   
-  const { data: topRatedMovies, loading: topRatedLoading } = 
+  const { data: topRatedMovies, loading: topRatedLoading, refetch: refetchTopRated } = 
     useFetch(() => fetchTopRatedMovies());
   
-  const { data: upcomingMovies, loading: upcomingLoading } = 
+  const { data: upcomingMovies, loading: upcomingLoading, refetch: refetchUpcoming } = 
     useFetch(() => fetchUpcomingMovies());
   
-  const { data: nowPlayingMovies, loading: nowPlayingLoading } = 
+  const { data: nowPlayingMovies, loading: nowPlayingLoading, refetch: refetchNowPlaying } = 
     useFetch(() => fetchNowPlayingMovies());
 
   const handleSeeAllPopular = () => {
@@ -125,9 +134,22 @@ export default function Index() {
     setSelectedMovie(null);
   };
 
-  const handleStatusChange = () => {
-    // Increment refresh trigger to force re-render of movie cards
+  const handleStatusChange = (movieId?: number) => {
+    // Only proceed if movieId is provided
+    if (!movieId) return;
+    
+    // Provide visual feedback only - no section reloading
     setRefreshTrigger(prev => prev + 1);
+    setUpdatedMovieIds(prev => new Set([...prev, movieId]));
+    
+    // Clear visual feedback after 800ms
+    setTimeout(() => {
+      setUpdatedMovieIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(movieId);
+        return newSet;
+      });
+    }, 800);
   };
 
   return (
@@ -218,6 +240,7 @@ export default function Index() {
               onSeeAll={handleSeeAllTrending}
               onOptionsPress={handleOptionsPress}
               refreshTrigger={refreshTrigger}
+              updatedMovieIds={updatedMovieIds}
             />
 
             <MovieSection
@@ -227,6 +250,7 @@ export default function Index() {
               onSeeAll={handleSeeAllNowPlaying}
               onOptionsPress={handleOptionsPress}
               refreshTrigger={refreshTrigger}
+              updatedMovieIds={updatedMovieIds}
             />
 
             <MovieSection
@@ -236,6 +260,7 @@ export default function Index() {
               onSeeAll={handleSeeAllTopRated}
               onOptionsPress={handleOptionsPress}
               refreshTrigger={refreshTrigger}
+              updatedMovieIds={updatedMovieIds}
             />
 
             <MovieSection
@@ -245,6 +270,7 @@ export default function Index() {
               onSeeAll={handleSeeAllUpcoming}
               onOptionsPress={handleOptionsPress}
               refreshTrigger={refreshTrigger}
+              updatedMovieIds={updatedMovieIds}
             />
 
             <MovieSection
@@ -254,6 +280,7 @@ export default function Index() {
               onSeeAll={handleSeeAllPopular}
               onOptionsPress={handleOptionsPress}
               refreshTrigger={refreshTrigger}
+              updatedMovieIds={updatedMovieIds}
             />
           </View>
         )}
